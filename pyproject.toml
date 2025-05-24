@@ -1,0 +1,38 @@
+[tool.poetry]
+name = "weather"
+version = "0.1.0"
+description = ""
+authors = ["Tryd0g0lik <work80@mail.ru>"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+asyncio = { version = "3.4.3", python = "3.10" }
+postgres = { version = "^4.0", python = "3.10" }
+python-dotenv = { version = "^1.0.1", python = "3.10" }
+scrypt = { version = "^0.8.27", python = "3.10" }
+psycopg2-pool = { version = "^1.2", python = "3.10" }
+djangorestframework-simplejwt = {version = "^5.5.0",  python = "3.10",  extras = ["crypto"] }
+psycopg2 = { version = "^2.9.10", python = "^3.10" } # psycopg2-binary
+django-bootstrap4= { version = "^25.1", python = "3.10" }
+Django= { version = "4.2.17", python = "3.10" }
+djangorestframework = { version = "^3.16.0", python = "3.10"}
+adrf = { version = "^0.1.9", python = "3.10"}
+django-webpack-loader = { version = "^3.1.1", python = "3.10"}
+django-cors-headers = { version = "4.6.0", python = "3.10"}
+
+[tool.poetry.group.dev.dependencies]
+pre-commit-hooks = { version = "5.0.0", python = "3.10" }
+pytest-django = { version = "^4.11.1", python = "3.10" }
+pytest-cov = { version = "^6.1.1", python = "3.10" }
+autohooks = { version = "^24.2.0", python = "3.10" }
+pre-commit = { version = "^4.0.1", python = "3.10" }
+pylint = { version = "^3.3.7", python = "3.10" }
+pytest = { version = "^8.3.5", python = "3.10" }
+pytest-mock = { version = "^3.14", python = "3.10" }
+model-bakery = { version = "^1.20.4", python = "3.10" }
+pytest-asyncio = { version = "^0.26.0", python = "3.10" }
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
