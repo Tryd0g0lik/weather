@@ -52,7 +52,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'dashboard',
-    'weathe',
+    'weather',
 ]
 
 MIDDLEWARE = [
@@ -161,7 +161,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 STATICFILES_DIRS = [
 ]
-STATIC_ROOT = os.path.join(BASE_DIR,  "weathe/static/")
+STATIC_ROOT = os.path.join(BASE_DIR,  "weather/static/")
 STATIC_URL = os.environ.get("STATIC_URL", "/static/")
 
 # MEDIA_ROOT = os.path.join(BASE_DIR,  "media/")
@@ -281,7 +281,7 @@ REST_FRAMEWORK = {
     )
 }
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes= 5),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days = 1),
+    "ACCESS_TOKEN_LIFETIME": timedelta(milliseconds=timedelta(minutes=5).total_seconds()*1000),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days = timedelta(days=1).total_seconds()*1000),
     "SIGNING_KEY": SECRET_KEY,
 }
