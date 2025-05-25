@@ -29,8 +29,51 @@ AuthUser = TypeVar("AuthUser", "Users", TokenUser)
 
 
 class Users(AbstractUser):
+    username = models.CharField(
+        _("username"),
+        max_length=30,
+        unique=True,
+        help_text=_(
+            "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+        ),
+        validators=[
+            MinLengthValidator(
+                3, message=_("Name should be at least 3 characters")
+            ),
+            MaxLengthValidator(
+                30, _("Name should be less than 30  or 30 characters")
+            ),
+            RegexValidator(
+                regex=r"(^[a-zA-Z][a-zA-Z_]{2,30}$|^$)",
+                message=_(
+                    "Name should contain only characters\
+from a-z and A-Z and digits"
+                ),
+            ),
+        ],
+        error_messages={
+            "unique": _("A user with that username already exists."),
+        },
+    )
 
+    password = models.CharField(
+        _("password"),
+        max_length=128,
+        validators=[
+            MaxLengthValidator(
+                7, message=_("Maximum quantity of symbols before 7 symbols/characters")
+            ),
+            MinLengthValidator(
+                2, message=_("Minimum quantity of symbols is 2 symbols/characters")
+            ),
+            RegexValidator(
+                regex=r"(^[a-zA-Z%0-9}{_%]{2,30}$|^$)",
+                message=_("The password's characters is valid"),
+            )
+        ]
+        )
     latitude = models.FloatField(
+        _("latitude"),
         max_length=7,
         blank=True,
         default=0.0,
@@ -45,6 +88,7 @@ class Users(AbstractUser):
         ],
     )
     longitude = models.FloatField(
+        _("longitude"),
         max_length=7,
         blank=True,
         default=0.0,
