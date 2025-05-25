@@ -56,9 +56,14 @@ https://members.ip-api.com/ \
  - '`LANGUAGE_CODE`' = '`ru`'; 
  - '`TIME_ZONE`' = '`Asia/Krasnoyarsk`'; 
  - CORS и '`CSRF_TRUSTED_ORIGINS`';
- - '`WEBPACK_LOADER`'
+ - '`WEBPACK_LOADER`';
+ - '`__tests__`' - тест файлы. Запуск вручную командой '`pytest`';
+ - '`logs.py`' конфигурация логирования прописана. В корне проекта логи '`log_putout.log`'.
+**Note:** *При сборке для '`prodaction`' удалить логи из кода*. 
 
 '`help_text`' настройка '`LANGUAGE_CODE`' совершается перевод строки. \
 Чаще всего видно при использовании форм django. '`<label>`' & '`help_text`' при \
 публикации - **ПЕРЕВОДИТСЯ АВТОМАТОМ** на язык из указанной зоны.
+
+
 

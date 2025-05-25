@@ -3,7 +3,6 @@
 
 ### Django ###
 *.log
-!logs.py
 *.pot
 *.pyc
 local_settings.py
@@ -276,6 +275,7 @@ frontend
 **/bundles
 !.browserslistrc
 !.editorconfig
+!logs.py
 swagger
 
 gunicorn.service
