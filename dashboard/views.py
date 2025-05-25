@@ -1,13 +1,11 @@
 """
 dashboard/views.py
 """
-
 import os
 import json
 import logging
 import requests
 from asgiref.sync import sync_to_async
-from geoip2 import database as location, webservice
 from datetime import datetime
 from typing import TypeVar, Dict
 from django.shortcuts import render
@@ -20,14 +18,6 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from dashboard.hasher import PassworHasher
 from dashboard.models import Users
 from dashboard.serializers import UsersSerializer
-
-# from django.contrib.auth.base_user import AbstractBaseUser
-
-# from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-# from rest_framework_simplejwt.views import TokenObtainPairView
-# from rest_framework_simplejwt.exceptions import InvalidToken
-# from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
-# from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 from project.settings import BASE_DIR, SECRET_KEY, SIMPLE_JWT
 
 # Create your views here.
@@ -227,30 +217,3 @@ class UsersViewSet(ViewSet):
             return token
         except Exception as ex:
             raise ValueError("Value Error: %s" % ex)
-
-
-def user_view(request):
-    # form_reg =UserRegister()
-    # form = ""  # UserLogin()
-    # form = AuthenticationForm()
-    title = "Вход в аккаунт"
-    if "register" in request.path.lower():
-        # form = UserCreationForm()
-        # form = ""  #  UserRegisterForm()
-        title = "Регистрация"
-
-    files = os.listdir(f"{BASE_DIR}/ads/static/scripts")
-    css_file = "styles/index.css"
-
-    return render(
-        request,
-        "register/index.html",
-        {
-            "js_files": files,
-            "css_file": css_file,
-            # "form": {
-            #     "form_user": form,
-            # },
-            "title": title,
-        },
-    )
