@@ -3,7 +3,7 @@
 
 ### Django ###
 *.log
-logs.py
+!logs.py
 *.pot
 *.pyc
 local_settings.py

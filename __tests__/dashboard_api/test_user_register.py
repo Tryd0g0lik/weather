@@ -58,6 +58,63 @@ class TestUsers:
             self.LIST_URL[0], data={"password": password, "username": username}
         )
         log.info("GET RESPONSE FROM POST REQUEST %s" % str(response.status_code))
-        assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
         await sync_to_async(cleaner)(client)
         log.info("END TEST - USER NO CREATE - OK")
+    
+    @pytest.mark.users
+    @pytest.mark.users_login
+    async def test_user_login_user_valid    (self, client, cleaner):
+        log.info("START TEST - USER LOGI VALID")
+        """Arrange"""
+        cache.clear()
+        log.info("BEFORE USER's REGISTER")
+        response = await sync_to_async(client.post)(
+            self.LIST_URL[0], data=self.VALID_DATA
+        )
+        log.info("GET RESPONSE FROM USER's REGISTER: %s" % str(response.status_code))
+        assert response.status_code == status.HTTP_201_CREATED
+        """Act"""
+        log.info("BEFORE USER's LOGIN")
+        response = await sync_to_async(client.post)(
+            self.LIST_URL[1], data=self.VALID_DATA
+        )
+        log.info("GET RESPONSE FROM POST REQUEST %s" % str(response.status_code))
+        assert response.status_code == status.HTTP_200_OK
+        log.info("RESPONSE DATA OF USER's LOGING: %s" % str(response.data))
+        assert 'data' in response.data.keys()
+        log.info("RESPONSE DATA hase 'data' key OK: %s " % str(response.data.keys()))
+        assert len(response.data['data']) == 2
+        log.info("RESPONSE DATA OF USER's LOGIN HAS TWO TOKENS")
+        await sync_to_async(cleaner)(client)
+        log.info("END TEST - USER LOGIN - VALID")
+
+    
+    @pytest.mark.parametrize("password, username",[
+        ("ds 2Rssa8%sa", "Victorovich"),
+        ("ds2-Rssa8%sa", "Victorovich"),
+        ("ds2Rssa8%sa", ""),
+        ("", "Victorovich"),
+        ("ss", "234567890"),
+    ])
+    @pytest.mark.users
+    @pytest.mark.users_login
+    async def test_user_login_user_invalid(self, client, cleaner, password, username):
+        log.info("START TEST - USER LOGI VALID")
+        """Arrange"""
+        cache.clear()
+        log.info("BEFORE USER's REGISTER")
+        response = await sync_to_async(client.post)(
+            self.LIST_URL[0], data=self.VALID_DATA
+        )
+        log.info("GET RESPONSE FROM USER's REGISTER: %s" % str(response.status_code))
+        assert response.status_code == status.HTTP_201_CREATED
+        """Act"""
+        log.info("BEFORE USER's LOGIN: PASSWORD - PASSWORD: %s, USERNAME: %s" % (password, username))
+        response = await sync_to_async(client.post)(
+            self.LIST_URL[1], data={"password": password, "username": username}
+        )
+        log.info("GET RESPONSE FROM POST REQUEST %s" % str(response.status_code))
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        await sync_to_async(cleaner)(client)
+        log.info("END TEST - USER LOGIN INVALID - OK")

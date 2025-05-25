@@ -85,7 +85,7 @@ class UsersViewSet(ViewSet):
                 log.error("SERIALIZER DATA ERROR: %s", ex.args)
                 return Response(
                     {"detail": ex.args},
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    status=status.HTTP_401_UNAUTHORIZED
                 )
         log.error("USER NOT CREATED")
         return Response(
@@ -186,7 +186,7 @@ class UsersViewSet(ViewSet):
             log.error("USER ERROR: %s", ex.args)
             return Response(
                 {"detail": ex.args},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                status=status.HTTP_401_UNAUTHORIZED
             )
 
     @classmethod
