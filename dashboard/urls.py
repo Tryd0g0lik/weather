@@ -2,7 +2,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from dashboard.views import UsersViewSet, user_view
+from dashboard.views import UsersViewSet
 
 router = DefaultRouter()
 router.register("index", UsersViewSet, basename="index")
