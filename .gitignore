@@ -276,6 +276,7 @@ frontend
 !.browserslistrc
 !.editorconfig
 !logs.py
+!*log*.py
 swagger
 
 gunicorn.service

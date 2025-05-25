@@ -1,6 +1,7 @@
 """
 dashboard/views.py
 """
+
 import os
 import json
 import logging
@@ -9,12 +10,13 @@ from asgiref.sync import sync_to_async
 from datetime import datetime
 from typing import TypeVar, Dict
 from django.shortcuts import render
-from rest_framework import serializers, status  # , viewsets
 from adrf.viewsets import ViewSet
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-
+from rest_framework import serializers, status  # , viewsets
+from dashboard.forms.form_login import UserLogin
+from dashboard.forms.form_register import UserRegisterForm
 from dashboard.hasher import PassworHasher
 from dashboard.models import Users
 from dashboard.serializers import UsersSerializer
@@ -74,8 +76,7 @@ class UsersViewSet(ViewSet):
             except Exception as ex:
                 log.error("SERIALIZER DATA ERROR: %s", ex.args)
                 return Response(
-                    {"detail": ex.args},
-                    status=status.HTTP_401_UNAUTHORIZED
+                    {"detail": ex.args}, status=status.HTTP_401_UNAUTHORIZED
                 )
         log.error("USER NOT CREATED")
         return Response(
@@ -174,10 +175,7 @@ class UsersViewSet(ViewSet):
             )
         except Exception as ex:
             log.error("USER ERROR: %s", ex.args)
-            return Response(
-                {"detail": ex.args},
-                status=status.HTTP_401_UNAUTHORIZED
-            )
+            return Response({"detail": ex.args}, status=status.HTTP_401_UNAUTHORIZED)
 
     @classmethod
     async def async_token(cls, user_object: AuthUser):
@@ -217,3 +215,30 @@ class UsersViewSet(ViewSet):
             return token
         except Exception as ex:
             raise ValueError("Value Error: %s" % ex)
+
+
+def dashboard_view(request):
+
+    form = UserLogin()
+    # form = AuthenticationForm()
+    title = "Вход в аккаунт"
+    if "register" in request.path.lower():
+        # form = UserCreationForm()
+        form = UserRegisterForm()
+        title = "Регистрация"
+
+    files = os.listdir(f"{BASE_DIR}/weather/static/scripts")
+    css_file = "styles/index.css"
+
+    return render(
+        request,
+        "users/index.html",
+        {
+            "js_files": files,
+            "css_file": css_file,
+            "title": title,
+            "form": {
+                "form_user": form,
+            },
+        },
+    )
