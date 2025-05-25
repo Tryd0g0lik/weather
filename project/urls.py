@@ -24,5 +24,5 @@ from dashboard.urls import router as users_router
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/v1/", include((users_router, "users_router"), namespace="users_router")),
+    path("api/v1/users/", include((users_router.urls, "users"), namespace="users")),
 ]

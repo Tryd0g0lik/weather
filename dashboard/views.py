@@ -5,19 +5,21 @@ dashboard/views.py
 import os
 import json
 import logging
-
+import requests
 from asgiref.sync import sync_to_async
-from geoip2 import database as location
+from geoip2 import database as location, webservice
 from datetime import datetime
 from typing import TypeVar, Dict
 from django.shortcuts import render
-from rest_framework import serializers, viewsets, status
+from rest_framework import serializers, status  # , viewsets
+from adrf.viewsets import ViewSet
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from dashboard.hasher import PassworHasher
 from dashboard.models import Users
+from dashboard.serializers import UsersSerializer
 
 # from django.contrib.auth.base_user import AbstractBaseUser
 
@@ -45,10 +47,74 @@ def serializer_validate(serializer):
     log.info("SERIALIZER DATA VALID", serializer.validated_data)
 
 
-class UsersViewSet(viewsets.ViewSet):
-    @action(methods=["POST"], detail=False)
-    async def login_user(self, request) -> {Dict[str, str]}:
-        """HASHING PASSWORD"""
+class UsersViewSet(ViewSet):
+    """
+    This is a simple API to create a user and login users\
+    This 'create' method is sync view. It has the 'api/v1/users/index/' api key.\
+    before, user registration, request's data will be checking for user's duplicate by 'username'.
+    If, only 'username' of data request is unique, then it will be created through the serializer.\
+    And. 'password' from data request will be hashed before saving.\
+
+    This 'login_user' method is async view. It has the '/api/v1/users/index/0/login_user/' api key.\
+    Here, pas
+    """
+
+    def create(self, request) -> type(Response):
+        """CHECK USER DATA"""
+        user = request.user
+        salt = SECRET_KEY.replace("$", "/")
+        h = PassworHasher()
+        password_hash = h.hasher(request.data.get("password"), salt[:50])
+        log.info("PASSWORD HASH: %s", password_hash)
+        """CHECK USER EXISTS"""
+        user_list = Users.objects.filter(username=request.data.get("username"))
+
+        log.info("USER EXISTS: %s", user_list.exists())
+        if not user.is_authenticated and not user_list.exists():
+            try:
+                serializer = UsersSerializer(data=request.data)
+                serializer_validate(serializer)
+                serializer.validated_data["password"] = password_hash
+                serializer.save()
+                log.info("USER CREATED SUCCESSFUL")
+                return Response(
+                    {"data": "USER CREATED"}, status=status.HTTP_201_CREATED
+                )
+
+            except Exception as ex:
+                log.error("SERIALIZER DATA ERROR: %s", ex.args)
+                return Response(
+                    {"detail": ex.args},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                )
+        log.error("USER NOT CREATED")
+        return Response(
+            json.dumps({"detail": "USER NOT CREATED"}),
+            status=status.HTTP_401_UNAUTHORIZED,
+        )
+
+    @action(methods=["POST"], detail=True)
+    async def login_user(self, request, pk: str = "0"):
+        """
+        This method is used the user's login and IP ADDRESS of client.
+        Here, If wwe have the object of user , it means we will  get token objects for user.
+        "token_access" - it is general token of user for access to the service.
+        "token_refresh" - it is token for refresh the access token.
+        :param request:
+        :param pk: not used. It is just for URL.
+        :return: ```js
+        {"data":[
+                    {
+                        "token_access": str( < access_token >),
+                        "live_time": < lifetime_from_minutes >,
+                    },
+                    {
+                        "token_refresh": str(tokens),
+                        "live_time": < lifetime_from_hours >,
+                    },
+                ]}
+                ````
+        """
         password = request.data.get("password")
         login = request.data.get("username")
         hash = PassworHasher()
@@ -56,51 +122,75 @@ class UsersViewSet(viewsets.ViewSet):
         hash_password = hash.hasher(password, salt[:50])
 
         """CHECK EXISTS OF USER"""
-        user_list = sync_to_async(Users.objects.filter)(
+        user_one = await sync_to_async(Users.objects.filter)(
             username=login, password=hash_password
         )
-        if not user_list.exists():
+        user_one = await sync_to_async(user_one.first)()
+
+        if not user_one:
             log.error("USER NOT FOUNDED")
             return Response(
-                json.dumps({"data": "User not founded"}),
+                {"data": "User not founded"},
                 status=status.HTTP_401_UNAUTHORIZED,
             )
 
         """GET USER DATA"""
-        user = user_list[0]
-        user.is_active = True
-        user.is_anonymous = False
-        user.last_login = datetime.now()
+        user_one.is_active = True
+        # user_one.is_anonymous = False
+
+        user_one.last_login = datetime.now()
         """GET LOCATION OF USER"""
-        user_ip_address = request.META.get("REMOTE_ADDR")
+        user_ip_address = request.META.get("REMOTE_ADDR")  # Не трогать - используется
 
         try:
-            reader = location.Reader("GeoLite2-City.mmdb")
-            response = reader.city(user_ip_address)
-            latitude: float = response.location.latitude
-            longitude: float = response.location.longitude
+            response = await sync_to_async(requests.post)(
+                "http://ip-api.com/batch",
+                data=json.dumps(
+                    [
+                        {
+                            "query": "83.166.245.197",  # Изменить на user_ip_address
+                            "fields": ["lat", "lon"],  # Исправлено на lat/lon
+                            "lang": "ru",
+                        }
+                    ]
+                ),
+            )
+            response = response.json()
+            """GET LOCATION BASIS/INITIAL"""
+            latitude: float = response[0]["lat"]
+            longitude: float = response[0]["lon"]
             log.info("LATITUDE OF USER: %s", latitude)
-            log.info("LONGITUDE OF USER: %s", longitude)
-            user.set_latitude = {"latitude": latitude}
-            user.set_longitude = {"longitude": longitude}
+            user_one.latitude = latitude
+            user_one.longitude = longitude
             """SAVE USER"""
-            user.save()
-            log.info("USER IS ACTIVE: %s", user.is_active)
-            # token = LogingViewSet._jwt_get_token(user)
-            """LOGIN USER"""
-            log.info("USER FOUND")
-
-            token: dict = await self.async_token(user)
-            return Response(token, status=status.HTTP_200_OK)
+            await sync_to_async(user_one.save)()
+            log.info("USER IS ACTIVE: %s", user_one.is_active)
+            tokens = await self.async_token(user_one)
+            log.info("USER TOKEN IS ACTIVE: %s", str(tokens))
+            return Response(
+                {
+                    "data": [
+                        {
+                            "token_access": str(tokens.access_token),
+                            "live_time": SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"],
+                        },
+                        {
+                            "token_refresh": str(tokens),
+                            "live_time": SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"],
+                        },
+                    ]
+                },
+                status=status.HTTP_200_OK,
+            )
         except Exception as ex:
             log.error("USER ERROR: %s", ex.args)
             return Response(
-                json.dumps({"detail": ex.args}),
+                {"detail": ex.args},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
     @classmethod
-    async def async_token(cls, user_object: AuthUser) -> {Dict[str, str]}:
+    async def async_token(cls, user_object: AuthUser):
         """
         This is method for getting token for user.
         :param user_object: This is a user's object for a which will be token generating \
@@ -114,10 +204,8 @@ class UsersViewSet(viewsets.ViewSet):
         tokens = await cls.__async_generate_jwt_token(user_object)
         return tokens
 
-    @classmethod
-    async def __async_generate_jwt_token(
-        cls, user_object: AuthUser
-    ) -> {Dict[str, str]}:
+    @staticmethod
+    async def __async_generate_jwt_token(user_object: AuthUser) -> {Dict[str, str]}:
         """
         Only, after registration user we will be generating token for \
         user through 'rest_framework_simplejwt.serializers.TokenObtainPairSerializer'
@@ -134,21 +222,9 @@ class UsersViewSet(viewsets.ViewSet):
         # dt = datetime.datetime.now() + datetime.timedelta(days=1)
         """GET TOKEN"""
         try:
-
-            token = await sync_to_async(TokenObtainPairSerializer.get_token)(
-                user_object
-            )
+            token = TokenObtainPairSerializer.get_token(user_object)
             token["name"] = (lambda: user_object.username)()
-            return {
-                {
-                    "token_access": str(token.access_token),
-                    "live_time": SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"],
-                },
-                {
-                    "token_refresh": str(token),
-                    "live_time": SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"],
-                },
-            }
+            return token
         except Exception as ex:
             raise ValueError("Value Error: %s" % ex)
 

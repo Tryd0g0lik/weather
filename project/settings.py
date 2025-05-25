@@ -275,13 +275,16 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 """REST_FRAMEWORK JWT SETTINGS"""
+# https://pypi.org/project/djangorestframework-simplejwt/4.3.0/Я
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
 }
+    # "access_token_lifetime": TIMEDELTA(MILLISECONDS=TIMEDELTA(MINUTES=5).TOTAL_SECONDS()*1000),
+    # "refresh_token_lifetime": TIMEDELTA(DAYS = TIMEDELTA(DAYS=1).TOTAL_SECONDS()*1000),
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(milliseconds=timedelta(minutes=5).total_seconds()*1000),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days = timedelta(days=1).total_seconds()*1000),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes= 5),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days = 1),
     "SIGNING_KEY": SECRET_KEY,
 }
