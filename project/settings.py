@@ -52,7 +52,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'dashboard',
-    'weathe',
+    'weather',
 ]
 
 MIDDLEWARE = [
@@ -161,7 +161,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 STATICFILES_DIRS = [
 ]
-STATIC_ROOT = os.path.join(BASE_DIR,  "weathe/static/")
+STATIC_ROOT = os.path.join(BASE_DIR,  "weather/static/")
 STATIC_URL = os.environ.get("STATIC_URL", "/static/")
 
 # MEDIA_ROOT = os.path.join(BASE_DIR,  "media/")
@@ -170,7 +170,7 @@ STATIC_URL = os.environ.get("STATIC_URL", "/static/")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 DEFAULT_CHARSET = "utf-8"
-# AUTH_USER_MODEL = "ads.CustomUser"
+AUTH_USER_MODEL = "dashboard.Users"
 
 # '''CORS'''
 # False - это значение по умолчанию и означает, что сервер не будет
@@ -275,11 +275,14 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 """REST_FRAMEWORK JWT SETTINGS"""
+# https://pypi.org/project/djangorestframework-simplejwt/4.3.0/Я
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
 }
+    # "access_token_lifetime": TIMEDELTA(MILLISECONDS=TIMEDELTA(MINUTES=5).TOTAL_SECONDS()*1000),
+    # "refresh_token_lifetime": TIMEDELTA(DAYS = TIMEDELTA(DAYS=1).TOTAL_SECONDS()*1000),
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes= 5),
     "REFRESH_TOKEN_LIFETIME": timedelta(days = 1),

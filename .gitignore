@@ -3,7 +3,6 @@
 
 ### Django ###
 *.log
-logs.py
 *.pot
 *.pyc
 local_settings.py
@@ -50,6 +49,7 @@ MANIFEST
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
+**/*log*
 
 # Unit test / coverage reports
 htmlcov/
@@ -275,6 +275,7 @@ frontend
 **/bundles
 !.browserslistrc
 !.editorconfig
+!logs.py
 swagger
 
 gunicorn.service
