@@ -45,44 +45,36 @@ def serializer_validate(serializer):
 class WeatherViewSet(ViewSet):
 
     def create(self, request) -> Response:
+        pass
         #
-        user = request.user
-        # GET WETHER DATA
-        result = WeatherForecast.objects.filter(id=user.id)
-        if isinstance(user, TokenUser):
-            user = Users.objects.get(username=user.username)
-        # TODO: Change this to a GET request
-        try:
-            response = requests.get(
-                "https://api.openweathermap.org/data/2.5/weather?q=London&appid=1d376d6b3636600b9314d565520f8386"
-            )
-            return Response({"data": response.status_code}, status=status.HTTP_200_OK)
-        except requests.exceptions.ConnectionError:
-            log.error("WEATHER API CONNECTION ERROR")
-            return Response(
-                {"detail": "WEATHER API CONNECTION ERROR"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        # user = request.user
+        # # GET WETHER DATA
+        # result = WeatherForecast.objects.filter(id=user.id)
+        # if isinstance(user, TokenUser):
+        #     user = Users.objects.get(username=user.username)
+        # # TODO: Change this to a GET request
+        # try:
+        #     response = requests.get(
+        #         "https://api.openweathermap.org/data/2.5/weather?q=London&appid=1d376d6b3636600b9314d565520f8386"
+        #     )
+        #     return Response({"data": response.status_code}, status=status.HTTP_200_OK)
+        # except requests.exceptions.ConnectionError:
+        #     log.error("WEATHER API CONNECTION ERROR")
+        #     return Response(
+        #         {"detail": "WEATHER API CONNECTION ERROR"},
+        #         status=status.HTTP_400_BAD_REQUEST,
+        #     )
 
 
 def weather_view(request):
-
-    # form_reg =UserRegister()
-    # form = UserLogin()
-    # form = AuthenticationForm()
-    title = "Главная"
-    # if "register" in request.path.lower():
-    # form = UserCreationForm()
-    # form = UserRegisterForm()
-
-    # title = "Регистрация"
+    title = "Прогноз погоды"
 
     files = os.listdir(f"{BASE_DIR}/weather/static/scripts")
     css_file = "styles/index.css"
 
     return render(
         request,
-        "weather/index.html",
+        "layout/index.html",
         {
             "js_files": files,
             "css_file": css_file,

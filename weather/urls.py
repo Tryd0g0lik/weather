@@ -6,5 +6,5 @@ router = DefaultRouter()
 router.register("index", WeatherViewSet, basename="index")
 
 urlpatterns = [
-    path("weather", weather_view, name="weather"),
+    path("", weather_view, name="weather"),
 ]

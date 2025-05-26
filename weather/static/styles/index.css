@@ -1,6 +1,7 @@
 /*!**************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[1]!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./src/styles/style.scss ***!
   \**************************************************************************************************************************************************************************************/
+@charset "UTF-8";
 -p,
 a,
 h1,
@@ -110,7 +111,43 @@ div.hidden {
   vertical-align: top;
 }
 
-/* ---- PAGE OF ONE AD ----*/
+/* ----- WEATHER SEARCH CITIES FORM-----*/
+#search {
+  position: relative;
+}
+
+#search_suggest {
+  background-color: rgba(255, 255, 255, 0.3);
+  top: 38px;
+  position: absolute;
+  border: 0;
+  left: 0;
+  width: 230px;
+  overflow: hidden;
+}
+#search_suggest ul {
+  padding-left: 5px;
+}
+#search_suggest li {
+  cursor: pointer;
+  list-style-type: none;
+  border-bottom: 1px solid var(--bs-secondary-border-subtle);
+  color: var(--bs-body-color);
+  font-weight: 100;
+  text-shadow: 0 0 black;
+  min-height: 26px;
+}
+
+#ads-collections ul {
+  height: 62vh;
+  overflow-y: auto;
+}
+#ads-collections li {
+  color: var(--bs-body-color);
+  list-style-type: none;
+}
+
+/* ---- PAGE OF ONE AD проверить! ----*/
 #ad-page-container {
   height: clamp(100px, 47vh, 500px);
 }

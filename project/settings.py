@@ -73,8 +73,9 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             os.path.join(BASE_DIR, "templates/"),
-            os.path.join(BASE_DIR, "dashboard/templates"),
-            os.path.join(BASE_DIR, "weather/templates")
+            os.path.join(BASE_DIR, "weather/templates"),
+            os.path.join(BASE_DIR, "dashboard/templates/"),
+
         ],
         'APP_DIRS': True,
         'OPTIONS': {
