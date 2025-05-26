@@ -79,9 +79,11 @@
     <div class="comments-list"></div>
   {% endblock comments %}
   </section>
-<section class="form">
+<div class="title"><h3>{{title}}</h3></div>
+<section class="form" id="form-login">
+
   {% block forms_main %}
-  <div class="title"><h3>{{title}}</h3></div>
+
   {% endblock forms_main %}
 </section>
 <section class="ads-collections" id="ads-collections">
