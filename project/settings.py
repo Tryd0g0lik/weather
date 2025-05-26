@@ -191,6 +191,8 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:8080",
 ]
 # разрешить cookie в HTTP запросах
+# SESSION_COOKIE_SECURE = True  # Для HTTPS
+# SESSION_COOKIE_HTTPONLY = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_METHODS = [
     "DELETE",
@@ -276,10 +278,13 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 """REST_FRAMEWORK JWT SETTINGS"""
-# https://pypi.org/project/djangorestframework-simplejwt/4.3.0/Я
+# https://pypi.org/project/djangorestframework-simplejwt/4.3.0/
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        # 'rest_framework.authentication.BasicAuthentication',
+        # 'rest_framework.authentication.SessionAuthentication',
+
     )
 }
     # "access_token_lifetime": TIMEDELTA(MILLISECONDS=TIMEDELTA(MINUTES=5).TOTAL_SECONDS()*1000),

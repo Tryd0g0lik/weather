@@ -28,6 +28,7 @@ from weather.urls import router as weather_router, urlpatterns as weather
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("weather/", include((weather, "weather"), namespace="weather")),
+    # path("", include((dashboard, "dashboard"), namespace="dashboard")),
     path("", include((dashboard, "dashboard"), namespace="dashboard")),
     path("api/v1/users/", include((users_router.urls, "users"), namespace="users")),
     path(
