@@ -1,24 +1,27 @@
 """
 dashboard/views.py
 """
+
 import os
 import json
 import logging
 import requests
 from asgiref.sync import sync_to_async
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import TypeVar, Dict
 from django.shortcuts import render
-from rest_framework import serializers, status  # , viewsets
 from adrf.viewsets import ViewSet
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-
+from rest_framework import serializers, status  # , viewsets
+from dashboard.forms.form_login import UserLogin
+from dashboard.forms.form_register import UserRegisterForm
 from dashboard.hasher import PassworHasher
 from dashboard.models import Users
 from dashboard.serializers import UsersSerializer
 from project.settings import BASE_DIR, SECRET_KEY, SIMPLE_JWT
+from django.contrib.auth import authenticate, login
 
 # Create your views here.
 from rest_framework_simplejwt.tokens import TokenUser
@@ -38,6 +41,7 @@ def serializer_validate(serializer):
 
 
 class UsersViewSet(ViewSet):
+    # authentication_classes = [SessionAuthentication, BasicAuthentication]
     """
     This is a simple API to create a user and login users\
     This 'create' method is sync view. It has the 'api/v1/users/index/' api key.\
@@ -52,9 +56,7 @@ class UsersViewSet(ViewSet):
     def create(self, request) -> type(Response):
         """CHECK USER DATA"""
         user = request.user
-        salt = SECRET_KEY.replace("$", "/")
-        h = PassworHasher()
-        password_hash = h.hasher(request.data.get("password"), salt[:50])
+        password_hash = self.hash_password(request.data.get("password"))
         log.info("PASSWORD HASH: %s", password_hash)
         """CHECK USER EXISTS"""
         user_list = Users.objects.filter(username=request.data.get("username"))
@@ -74,8 +76,7 @@ class UsersViewSet(ViewSet):
             except Exception as ex:
                 log.error("SERIALIZER DATA ERROR: %s", ex.args)
                 return Response(
-                    {"detail": ex.args},
-                    status=status.HTTP_401_UNAUTHORIZED
+                    {"detail": ex.args}, status=status.HTTP_401_UNAUTHORIZED
                 )
         log.error("USER NOT CREATED")
         return Response(
@@ -87,7 +88,7 @@ class UsersViewSet(ViewSet):
     async def login_user(self, request, pk: str = "0"):
         """
         This method is used the user's login and IP ADDRESS of client.
-        Here, If wwe have the object of user , it means we will  get token objects for user.
+        Here, If we have the object of user , it means we will  get token objects for user.
         "token_access" - it is general token of user for access to the service.
         "token_refresh" - it is token for refresh the access token.
         :param request:
@@ -105,17 +106,16 @@ class UsersViewSet(ViewSet):
                 ]}
                 ````
         """
-        password = request.data.get("password")
-        login = request.data.get("username")
-        hash = PassworHasher()
-        salt = SECRET_KEY.replace("$", "/")
-        hash_password = hash.hasher(password, salt[:50])
 
+        password = request.data.get("password")
+        login_user = request.data.get("username")
+        """HASH PASSWORD OF USER"""
+        hash_password = self.hash_password(request.data.get("password"))
         """CHECK EXISTS OF USER"""
-        user_one = await sync_to_async(Users.objects.filter)(
-            username=login, password=hash_password
+        user_one_list = await sync_to_async(Users.objects.filter)(
+            username=login_user, password=hash_password
         )
-        user_one = await sync_to_async(user_one.first)()
+        user_one = await sync_to_async(user_one_list.first)()
 
         if not user_one:
             log.error("USER NOT FOUNDED")
@@ -126,12 +126,20 @@ class UsersViewSet(ViewSet):
 
         """GET USER DATA"""
         user_one.is_active = True
-        # user_one.is_anonymous = False
-
-        user_one.last_login = datetime.now()
+        """GET AUTHENTICATION (USER SESSION) IN DJANGO """
+        user = await sync_to_async(authenticate)(
+            request, username=login_user, password=password
+        )
+        if user is not None:
+            await sync_to_async(login)(request, user)
+        else:
+            log.error("USER NOT FOUNDED")
+            return Response(
+                {"data": "User not founded"},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
         """GET LOCATION OF USER"""
         user_ip_address = request.META.get("REMOTE_ADDR")  # Не трогать - используется
-
         try:
             response = await sync_to_async(requests.post)(
                 "http://ip-api.com/batch",
@@ -152,21 +160,26 @@ class UsersViewSet(ViewSet):
             log.info("LATITUDE OF USER: %s", latitude)
             user_one.latitude = latitude
             user_one.longitude = longitude
+            user_one.last_login = datetime.now()
             """SAVE USER"""
             await sync_to_async(user_one.save)()
+            
             log.info("USER IS ACTIVE: %s", user_one.is_active)
             tokens = await self.async_token(user_one)
             log.info("USER TOKEN IS ACTIVE: %s", str(tokens))
+            """ ИЗМЕНИТЬ ВРЕМЯ"""
+            access_time = (SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"]).total_seconds() * 1000
+            refresh_time = SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"].total_seconds() * 1000
             return Response(
                 {
                     "data": [
                         {
                             "token_access": str(tokens.access_token),
-                            "live_time": SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"],
+                            "live_time": access_time,
                         },
                         {
                             "token_refresh": str(tokens),
-                            "live_time": SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"],
+                            "live_time": refresh_time,
                         },
                     ]
                 },
@@ -174,10 +187,7 @@ class UsersViewSet(ViewSet):
             )
         except Exception as ex:
             log.error("USER ERROR: %s", ex.args)
-            return Response(
-                {"detail": ex.args},
-                status=status.HTTP_401_UNAUTHORIZED
-            )
+            return Response({"detail": ex.args}, status=status.HTTP_401_UNAUTHORIZED)
 
     @classmethod
     async def async_token(cls, user_object: AuthUser):
@@ -217,3 +227,59 @@ class UsersViewSet(ViewSet):
             return token
         except Exception as ex:
             raise ValueError("Value Error: %s" % ex)
+        
+    @staticmethod
+    def hash_password(password):
+        """
+        This method for hashing user password.
+        :param password: Password of user before hashing (from request)
+        :return: password hashed
+        """
+        """HASH PASSWORD OF USER"""
+        hash = PassworHasher()
+        salt = SECRET_KEY.replace("$", "/")
+        hash_password = hash.hasher(password, salt[:50])
+        return hash_password
+
+def dashboard_view(request):
+
+    form = UserLogin()
+    # form = AuthenticationForm()
+    title = "Вход в аккаунт"
+    if "register" in request.path.lower():
+        # form = UserCreationForm()
+        form = UserRegisterForm()
+        title = "Регистрация"
+
+    files = os.listdir(f"{BASE_DIR}/weather/static/scripts")
+    css_file = "styles/index.css"
+
+    return render(
+        request,
+        "users/index.html",
+        {
+            "js_files": files,
+            "css_file": css_file,
+            "title": title,
+            "form": {
+                "form_user": form,
+            },
+        },
+    )
+
+
+def main_view(request):
+    title = "Добро пожаловать на сайт"
+
+    files = os.listdir(f"{BASE_DIR}/weather/static/scripts")
+    css_file = "styles/index.css"
+
+    return render(
+        request,
+        "index.html",
+        {
+            "js_files": files,
+            "css_file": css_file,
+            "title": title,
+        },
+    )

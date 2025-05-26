@@ -22,6 +22,7 @@ class TestUsers:
     VALID_DATA = {"password": "ds2Rssa8%sa", "username": "Victorovich"}
 
     @pytest.mark.users
+    @pytest.mark.users_create_valid
     async def test_user_create_valid(self, client, cleaner):
         log.info("START TEST - USER CREATE VALID")
         """Arrange"""
@@ -39,6 +40,7 @@ class TestUsers:
     @pytest.mark.parametrize(
         "password, username",
         [
+            ("ds2Rssa8%sa", "Victorovich"),
             ("ds 2Rssa8%sa", "Victorovich"),
             ("ds2-Rssa8%sa", "Victorovich"),
             ("ds2Rssa8%sa", ""),
@@ -47,6 +49,7 @@ class TestUsers:
         ],
     )
     @pytest.mark.users
+    @pytest.mark.users_create_invalid
     async def test_user_create_invalid(self, client, cleaner, password, username):
         log.info("START TEST - USER CREATE INVALID")
         """Arrange"""
@@ -61,10 +64,32 @@ class TestUsers:
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
         await sync_to_async(cleaner)(client)
         log.info("END TEST - USER NO CREATE - OK")
-    
+
+    @pytest.mark.users
+    @pytest.mark.duble_create_invalid
+    async def test_user_create_invalid(self, client, cleaner):
+        log.info("START TEST - USER CREATE INVALID")
+        """Arrange"""
+        cache.clear()
+
+        """Act"""
+        log.info("INVALID DATA:  %s" % str(self.VALID_DATA))
+        response = await sync_to_async(client.post)(
+            self.LIST_URL[0], data=self.VALID_DATA
+        )
+        assert response.status_code == status.HTTP_201_CREATED
+
+        log.info("INVALID DUBLE DATA:  %s" % str(self.VALID_DATA))
+        response = await sync_to_async(client.post)(
+            self.LIST_URL[0], data=self.VALID_DATA
+        )
+
+        await sync_to_async(cleaner)(client)
+        log.info("END TEST - USER NO CREATE - OK")
+
     @pytest.mark.users
     @pytest.mark.users_login
-    async def test_user_login_user_valid    (self, client, cleaner):
+    async def test_user_login_user_valid(self, client, cleaner):
         log.info("START TEST - USER LOGI VALID")
         """Arrange"""
         cache.clear()
@@ -82,21 +107,23 @@ class TestUsers:
         log.info("GET RESPONSE FROM POST REQUEST %s" % str(response.status_code))
         assert response.status_code == status.HTTP_200_OK
         log.info("RESPONSE DATA OF USER's LOGING: %s" % str(response.data))
-        assert 'data' in response.data.keys()
+        assert "data" in response.data.keys()
         log.info("RESPONSE DATA hase 'data' key OK: %s " % str(response.data.keys()))
-        assert len(response.data['data']) == 2
+        assert len(response.data["data"]) == 2
         log.info("RESPONSE DATA OF USER's LOGIN HAS TWO TOKENS")
         await sync_to_async(cleaner)(client)
         log.info("END TEST - USER LOGIN - VALID")
 
-    
-    @pytest.mark.parametrize("password, username",[
-        ("ds 2Rssa8%sa", "Victorovich"),
-        ("ds2-Rssa8%sa", "Victorovich"),
-        ("ds2Rssa8%sa", ""),
-        ("", "Victorovich"),
-        ("ss", "234567890"),
-    ])
+    @pytest.mark.parametrize(
+        "password, username",
+        [
+            ("ds 2Rssa8%sa", "Victorovich"),
+            ("ds2-Rssa8%sa", "Victorovich"),
+            ("ds2Rssa8%sa", ""),
+            ("", "Victorovich"),
+            ("ss", "234567890"),
+        ],
+    )
     @pytest.mark.users
     @pytest.mark.users_login
     async def test_user_login_user_invalid(self, client, cleaner, password, username):
@@ -110,7 +137,10 @@ class TestUsers:
         log.info("GET RESPONSE FROM USER's REGISTER: %s" % str(response.status_code))
         assert response.status_code == status.HTTP_201_CREATED
         """Act"""
-        log.info("BEFORE USER's LOGIN: PASSWORD - PASSWORD: %s, USERNAME: %s" % (password, username))
+        log.info(
+            "BEFORE USER's LOGIN: PASSWORD - PASSWORD: %s, USERNAME: %s"
+            % (password, username)
+        )
         response = await sync_to_async(client.post)(
             self.LIST_URL[1], data={"password": password, "username": username}
         )

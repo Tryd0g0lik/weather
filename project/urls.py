@@ -20,9 +20,19 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.urls import path, include
-from dashboard.urls import router as users_router
+from dashboard.urls import router as users_router, urlpatterns as dashboard
+from weather.urls import router as weather_router, urlpatterns as weather
+
+# from weather.urls import urlpatterns as weather_url
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("weather/", include((weather, "weather"), namespace="weather")),
+    # path("", include((dashboard, "dashboard"), namespace="dashboard")),
+    path("", include((dashboard, "dashboard"), namespace="dashboard")),
     path("api/v1/users/", include((users_router.urls, "users"), namespace="users")),
+    path(
+        "api/v1/weather/",
+        include((weather_router.urls, "weather"), namespace="weather"),
+    ),
 ]
