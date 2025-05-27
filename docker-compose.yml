@@ -27,7 +27,7 @@ services:
         python3 ./manage.py collectstatic --noinput
         python3 ./manage.py makemigrations
         python3 ./manage.py migrate
-        gunicorn -w 4 --bind 0.0.0.0:8000 weather.wsgi:application
+        gunicorn -w 4 --bind 0.0.0.0:8000 project.wsgi:application
     volumes:
       - static_volume:/www/src/weather/project/static
     depends_on:
