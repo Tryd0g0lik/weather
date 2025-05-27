@@ -8,7 +8,7 @@ RUN mkdir /www && \
     mkdir /www/src
 #    mkdir /www/src/weather && \
 #    mkdir /www/src/weather/project
-WORKDIR /www/src/weather
+WORKDIR /www/src
 COPY ./requirements.txt .
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt

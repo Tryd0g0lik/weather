@@ -77,15 +77,3 @@ from a-z and A-Z and digits"
             ),
         ],
     )
-
-    # def __str__(self):
-    #     return self.clean_password()
-    # def clean_password(self):
-    #     password = self.cleaned_data.get("password")
-    #     for validator in self.fields["password"].validators:
-    #         try:
-    #             validator(password)
-    #         except Exception as ex:
-    #             self.add_error("password", str(ex))
-    #     return password
-    #
