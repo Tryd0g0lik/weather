@@ -22,7 +22,7 @@ class UserLogin(forms.Form):
                 30, _("Name should be less than 30  or 30 characters")
             ),
             valid.RegexValidator(
-                regex="(^[a-zA-Z][\wa-zA_Z]+)",
+                regex=r"(^[a-zA-Z][\wa-zA_Z]+)",
                 message=_(
                     "Name should contain only characters\
 from a-z and A-Z and digits"
@@ -42,7 +42,7 @@ from a-z and A-Z and digits"
                 _("Password should be less than 30 characters"),
             ),
             valid.RegexValidator(
-                regex="([\w%)(}{]+$)",
+                regex=r"([\w%)(}{]+$)",
             ),
         ],
     )
