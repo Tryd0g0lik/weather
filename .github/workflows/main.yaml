@@ -4,6 +4,15 @@ on:
     branches: ['dev']
 
 jobs:
+  deploy_weather:
+      runs-on: ubuntu-latest
+      strategy:
+        matrix:
+          python-version: [ '3.x' ]
+      steps:
+        # cache remove
+        - name: Clear GitHub Actions cache
+          run: rm -rf $HOME/.cache/actions
   cicd_deploy:
       runs-on: ubuntu-latest
       strategy:
@@ -14,7 +23,7 @@ jobs:
         DEPLOY_USER: ${{ secrets.LOCAL_USER }}
 #        DEPLOY_KEY: ${{ secrets.SSH_KEY }}
         DEPLOY_PASSWORD: ${{ secrets.LOCAL_PASS }}
-      needs: deploy_menu
+#      needs: deploy_weather
       steps:
         - name: Deploy to GitHub Pages
           uses: appleboy/ssh-action@master
