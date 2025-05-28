@@ -1,0 +1,28 @@
+name: Django_weather
+on:
+  push:
+    branches: ['dev']
+
+jobs:
+  cicd_deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ '3.x' ]
+#      env:
+#        DEPLOY_HOST: ${{ secrets.SSH_HOST }}
+#        DEPLOY_USER: ${{ secrets.SSH_USER }}
+#        DEPLOY_KEY: ${{ secrets.SSH_KEY }}
+#        DEPLOY_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+#      needs: deploy_menu
+      steps:
+        - name: Deploy to GitHub Pages
+          uses: appleboy/ssh-action@master
+          with:
+            host: 127.0.0.1
+             #${{ secrets.SSH_HOST }} # API или домен сервере
+#            username: ${{ secrets.SSH_USER }} # пользователь сервера
+#            password: ${{ secrets.SSH_PASSWORD }}
+            # expect /home/denis/adboard/pull.exp # команда для выполнения на удаленном сервере
+            script: |
+              bash /home/root2/weather/pull.sh 
