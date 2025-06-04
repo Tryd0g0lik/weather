@@ -13,21 +13,21 @@ jobs:
         # cache remove
         - name: Clear GitHub Actions cache
           run: rm -rf $HOME/.cache/actions
-  cicd_deploy:
-      runs-on: ubuntu-latest
-      strategy:
-        matrix:
-          python-version: [ '3.x' ]
-      env:
-        DEPLOY_HOST: ${{ secrets.LOCAL_HOST }}
-        DEPLOY_USER: ${{ secrets.LOCAL_USER }}
-        DEPLOY_PASSWORD: ${{ secrets.LOCAL_PASS }}
-      steps:
-        - name: Deploy to GitHub Pages
-          uses: appleboy/ssh-action@master
-          with:
-            host: ${{env.DEPLOY_HOST}}
-            username: ${{ env.LOCAL_USER }} # пользователь сервера
-            password: ${{ env.LOCAL_PASS }} #пароль пользователя сервера
-            script: |
-              bash /home/root2/weather/pull.sh 
+#  cicd_deploy:
+#      runs-on: ubuntu-latest
+#      strategy:
+#        matrix:
+#          python-version: [ '3.x' ]
+#      env:
+#        DEPLOY_HOST: ${{ secrets.LOCAL_HOST }}
+#        DEPLOY_USER: ${{ secrets.LOCAL_USER }}
+#        DEPLOY_PASSWORD: ${{ secrets.LOCAL_PASS }}
+#      steps:
+#        - name: Deploy to GitHub Pages
+#          uses: appleboy/ssh-action@master
+#          with:
+#            host: ${{env.DEPLOY_HOST}}
+#            username: ${{ env.LOCAL_USER }} # пользователь сервера
+#            password: ${{ env.LOCAL_PASS }} #пароль пользователя сервера
+#            script: |
+#              bash /home/root2/weather/pull.sh
