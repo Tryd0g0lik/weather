@@ -28,7 +28,7 @@ jobs:
           uses: appleboy/ssh-action@master
           with:
             host: ${{env.DEPLOY_HOST}}
-            username: ${{ env.LOCAL_USER }} # пользователь сервера
-            password: ${{ GITHUB_TOKEN }} #пароль пользователя сервера
+            username: ${{ env.DEPLOY_USER }} # пользователь сервера
+            password: ${{ env.SSH_PRIVATE_KEY }} #пароль пользователя сервера
             script: |
               bash /home/denis/weather/pull.sh
