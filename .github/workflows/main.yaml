@@ -31,5 +31,6 @@ jobs:
             username: ${{ env.DEPLOY_USER }} # пользователь сервера
             key: ${{ env.SSH_PRIVATE_KEY }}
             password: ${{ env.DEPLOY_PASSWORD }}
+            ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
             script: |
               bash /home/denis/weather/pull.sh
