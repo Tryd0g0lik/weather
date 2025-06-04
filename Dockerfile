@@ -12,6 +12,7 @@ RUN mkdir /www && \
 WORKDIR /www/src
 COPY ./requirements.txt .
 RUN pip install --upgrade pip
+RUN pip install postgres >= 4.0
 RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install gunicorn
 COPY . .
