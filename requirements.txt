@@ -1,4 +1,4 @@
-postgres >= 4
+postgres >= 4.0
 python-dotenv >= 1.0.1
 scrypt >= 0.8.27
 psycopg2-pool >= 1.2
