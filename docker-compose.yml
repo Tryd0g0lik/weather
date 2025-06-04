@@ -2,8 +2,8 @@ services:
   db:
     container_name: postgres
     image: postgres
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+#    volumes:
+#      - postgres_data:/var/lib/postgresql/data
     env_file: ./.env
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
@@ -39,11 +39,11 @@ services:
     networks:
       - nginx_network
       - postgres_network
-    volumes:
-       - .:|/www/src
-       - volume_static:/www/src/weather/static
+#    volumes:
+#       - .:|/www/src
+#       - volume_static:/www/src/weather/static
       #- volume_static:/weather/static
-       - nginx_conf:/etc/nginx/conf.d/
+#       - nginx_conf:/etc/nginx/conf.d/
     depends_on:
       - db
     ports:
@@ -59,14 +59,14 @@ services:
       - nginx_network
     depends_on:
       - www
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - volume_static:/www/src/weather/static
-      - nginx_conf:/etc/nginx/conf.d/
+#    volumes:
+#      - postgres_data:/var/lib/postgresql/data
+#      - volume_static:/www/src/weather/static
+#      - nginx_conf:/etc/nginx/conf.d/
     restart: on-failure
     ports:
       - "80:80"
-volumes:
-  postgres_data:
-  volume_static:
-  nginx_conf:
+#volumes:
+#  postgres_data:
+#  volume_static:
+#  nginx_conf:

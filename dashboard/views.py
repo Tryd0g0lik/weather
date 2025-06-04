@@ -24,7 +24,7 @@ from project.settings import BASE_DIR, SECRET_KEY, SIMPLE_JWT
 from django.contrib.auth import authenticate, login
 
 # Create your views here.
-from rest_framework_simplejwt.tokens import TokenUser
+from rest_framework_simplejwt.tokens import TokenUser, RefreshToken
 from logs import configure_logging
 
 configure_logging(logging.INFO)
@@ -146,7 +146,7 @@ class UsersViewSet(ViewSet):
                 data=json.dumps(
                     [
                         {
-                            "query": "83.166.245.197",  # Изменить на user_ip_address
+                            "query": user_ip_address,  # Изменить на user_ip_address "83.166.245.197"
                             "fields": ["lat", "lon"],  # Исправлено на lat/lon
                             "lang": "ru",
                         }
@@ -163,7 +163,7 @@ class UsersViewSet(ViewSet):
             user_one.last_login = datetime.now()
             """SAVE USER"""
             await sync_to_async(user_one.save)()
-            
+
             log.info("USER IS ACTIVE: %s", user_one.is_active)
             tokens = await self.async_token(user_one)
             log.info("USER TOKEN IS ACTIVE: %s", str(tokens))
@@ -227,7 +227,19 @@ class UsersViewSet(ViewSet):
             return token
         except Exception as ex:
             raise ValueError("Value Error: %s" % ex)
-        
+
+    @staticmethod
+    def _jwt_user_refresh(item: AuthUser) -> Dict[str, str]:
+        """
+        Refresh token.
+        :param item: User object or token object.
+        """
+        refresh = RefreshToken.for_user(item)
+        return {
+            "token_access": str(refresh.access_token),
+            "token_refresh": str(refresh),
+        }
+
     @staticmethod
     def hash_password(password):
         """
@@ -240,6 +252,7 @@ class UsersViewSet(ViewSet):
         salt = SECRET_KEY.replace("$", "/")
         hash_password = hash.hasher(password, salt[:50])
         return hash_password
+
 
 def dashboard_view(request):
 

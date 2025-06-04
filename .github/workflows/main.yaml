@@ -21,17 +21,13 @@ jobs:
       env:
         DEPLOY_HOST: ${{ secrets.LOCAL_HOST }}
         DEPLOY_USER: ${{ secrets.LOCAL_USER }}
-#        DEPLOY_KEY: ${{ secrets.SSH_KEY }}
         DEPLOY_PASSWORD: ${{ secrets.LOCAL_PASS }}
-#      needs: deploy_weather
       steps:
         - name: Deploy to GitHub Pages
           uses: appleboy/ssh-action@master
           with:
             host: ${{env.DEPLOY_HOST}}
-             #${{ secrets.SSH_HOST }} # API или домен сервере
             username: ${{ env.LOCAL_USER }} # пользователь сервера
             password: ${{ env.LOCAL_PASS }} #пароль пользователя сервера
-            # expect /home/denis/adboard/pull.exp # команда для выполнения на удаленном сервере
             script: |
               bash /home/root2/weather/pull.sh 
