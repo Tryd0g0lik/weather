@@ -29,6 +29,6 @@ jobs:
           with:
             host: ${{env.DEPLOY_HOST}}
             username: ${{ env.LOCAL_USER }} # пользователь сервера
-            password: ${{ secrets.GITHUB_TOKEN }} #пароль пользователя сервера
+            password: ${{ GITHUB_TOKEN }} #пароль пользователя сервера
             script: |
               bash /home/denis/weather/pull.sh
