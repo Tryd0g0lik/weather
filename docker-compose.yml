@@ -15,8 +15,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-    wetworks:
-      - postgres_network
     ports:
       - "5432:5432"
   www:
@@ -36,9 +34,6 @@ services:
         python3 ./manage.py migrate
         gunicorn -w 4 --bind 0.0.0.0:8000 project.wsgi:application
     #working_dir: /www/src
-    networks:
-      - nginx_network
-      - postgres_network
 #    volumes:
 #       - .:|/www/src
 #       - volume_static:/www/src/weather/static
@@ -55,8 +50,6 @@ services:
       context: ./nginx
       dockerfile: Dockerfile
     #working_dir: /var/www/
-    networks:
-      - nginx_network
     depends_on:
       - www
 #    volumes:
