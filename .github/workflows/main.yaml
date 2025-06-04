@@ -31,6 +31,4 @@ jobs:
             username: ${{ env.LOCAL_USER }} # пользователь сервера
             key: ${{ secrets.SSH_PRIVATE_KEY }} #пароль пользователя сервера
             script: |
-              ssh denis@83.166.245.197
-              cd /home/denis/weather
               bash /home/denis/weather/pull.sh
