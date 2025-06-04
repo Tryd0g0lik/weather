@@ -1,4 +1,4 @@
-python-dotenv >= 1.0.1
+python-dotenv >= 1
 scrypt >= 0.8.27
 psycopg2-pool >= 1.2
 djangorestframework-simplejwt[crypto] >= 5
