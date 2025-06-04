@@ -11,6 +11,8 @@ RUN mkdir /www && \
     mkdir /www/src/weather/static
 WORKDIR /www/src
 COPY ./requirements.txt .
+RUN python3 -m venv env
+RUN source env/bin/activate
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install gunicorn
