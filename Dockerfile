@@ -12,7 +12,7 @@ RUN mkdir /www && \
 WORKDIR /www/src
 COPY ./requirements.txt .
 RUN python3 -m venv env
-RUN env/scripts/activate
+RUN source env/scripts/activate
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install gunicorn
