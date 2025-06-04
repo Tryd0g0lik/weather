@@ -1,4 +1,4 @@
-scrypt >= 0.8.27
+scrypt >= 0
 psycopg2-pool >= 1.2
 djangorestframework-simplejwt[crypto] >= 5
 psycopg2-binary >= 2.9
