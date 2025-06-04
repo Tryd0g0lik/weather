@@ -12,7 +12,7 @@ RUN mkdir /www && \
 WORKDIR /www/src
 COPY ./requirements.txt .
 RUN pip install --upgrade pip
-RUN pip install --no-cache-dir --default-timeout=200 -r requirements.txt
+RUN pip install --no-cache-dir --default-timeout=10200 -r requirements.txt
 RUN pip install gunicorn
 COPY . .
 #RUN python manage.py collectstatic --noinput
