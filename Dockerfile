@@ -2,8 +2,8 @@ FROM python:3
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 RUN apt update
-RUN apt install -y python3-venv && \
-    pip
+RUN apt install -y python3-venv
+RUN apt-get install -y python3-pip
 RUN mkdir /www && \
     mkdir /www/src && \
     mkdir /www/src/weather && \
