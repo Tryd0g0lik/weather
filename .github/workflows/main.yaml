@@ -22,12 +22,13 @@ jobs:
         DEPLOY_HOST: ${{ secrets.LOCAL_HOST }}
         DEPLOY_USER: ${{ secrets.LOCAL_USER }}
         DEPLOY_PASSWORD: ${{ secrets.LOCAL_PASS }}
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       steps:
         - name: Deploy to GitHub Pages
           uses: appleboy/ssh-action@master
           with:
             host: ${{env.DEPLOY_HOST}}
             username: ${{ env.LOCAL_USER }} # пользователь сервера
-            password: ${{ env.LOCAL_PASS }} #пароль пользователя сервера
+            key: ${{ env.SSH_PRIVATE_KEY }} #пароль пользователя сервера
             script: |
               bash /home/denis/weather/pull.sh
