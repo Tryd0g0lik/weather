@@ -12,7 +12,7 @@ WORKDIR /www/src
 COPY ./requirements.txt .
 RUN pip3 install --upgrade pip
 RUN pip3 cache purge
-RUN pip3 install --no-cache-dir --default-timeout=200100 -r requirements.txt
+RUN pip3 install --no-cache -r requirements.txt
 RUN pip3 install gunicorn
 COPY . .
 #RUN python manage.py collectstatic --noinput
