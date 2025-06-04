@@ -1,9 +1,9 @@
 FROM python:3
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
-RUN apt update
-RUN apt install -y python3-venv
-RUN apt install -y python3-pip
+RUN apt-get update
+RUN apt-get install -y python3-venv
+RUN apt-get install -y python3-pip
 RUN python3 -m ensurepip --upgrade
 RUN mkdir /www && \
     mkdir /www/src && \
