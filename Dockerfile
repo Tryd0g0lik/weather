@@ -1,7 +1,7 @@
 FROM python:3
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
-RUN sudo apt update
+RUN apt update
 RUN sudo apt install python3-venv
 RUN sudo apt install python3-pip
 RUN mkdir /www && \
